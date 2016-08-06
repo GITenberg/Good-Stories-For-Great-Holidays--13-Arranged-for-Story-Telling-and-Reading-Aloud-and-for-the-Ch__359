@@ -1,0 +1,61 @@
+sudo: required
+dist: trusty
+language: ruby
+
+before_install:
+before_install:
+- gem install asciidoctor -v 1.5.2
+- gem install tilt
+- sudo pip install git+https://github.com/gitenberg-dev/gitberg
+- sudo pip install pillow
+- sudo pip install cssutils
+- sudo pip install docutils
+- sudo pip install roman
+- sudo pip install git+https://github.com/gitenberg-dev/pg-epubmaker
+script:
+- VERSION=`ruby -e "require 'yaml'; meta = YAML.load_file('metadata.yaml'); puts meta['_version'];"`
+- git clone https://github.com/gitenberg-dev/asciidoctor-htmlbook.git
+- sudo pip install -r asciidoctor-htmlbook/gitberg-machine/requirements.txt
+
+- /usr/bin/python -c "from gitenberg import travis; travis.build_epub()"
+- ebook-convert book.epub book.mobi
+- xvfb-run ebook-convert book.epub book.pdf
+branches:
+  only:
+  - master
+notifications:
+  webhooks:
+    urls:
+      - https://unglue.it/api/travisci/webhook
+    on_success: always
+    on_failure: never
+    on_start: never
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: yuwxDpmh4P/WvhQSRBJRKNBgrOxnQ4W28AmLRQuhsWsHZffV1G30jI3QMfS8B6dptxMT7qYkcTSB5DNNlUoE9FzuAE1IB6rG7J1HKlkjIsQdaJWeBQ5j8sF4BcvIDkJOn0yK792xhaKlZrgGEcn7O0ouMV5OENJ+0k/h49TfymPdd6saO4y1sPyN/jeY24fJnc/jjX8+vf+dj0GXDiJFcYAs37UXGuc12BvUrLkjT6XVhmVmV9BWuB7smsxPdqGTnjBSo5wCs/08tU5D0peFpS3kdqTCK3fo2+0Bc69mpbkLb/FZZDFsA3fnc/vLe57kqtEcRZo5bbaadYqEqtAOPrqSQeB48Qc6jSeYk+nqzlzPU6zoZPwaIgQ8UHI2srKF87YHmPZReWIzW5cMIu34jmGA/XF1lQ7RtstAt6ouOm7326ryG5jVae/MDsSzZE9Jb7pCMhm/hmhOf7VZ2Z9B1SfQ8E/Xs2bsOP/LVXtJy96j28WCvCr3rq0KksbaIduZBKdmwfzZuM6+Z++qprK+FMyCBjxcUvw/S0vUaNQVstIIbteyTe4NfaS/gQi/JP9zhgR3BcIGX9a6nMhX3SAEYoQwRPZA51iXwU4Bk+KQrTiiIRdng4gemYzJIMKHBRv4cSZ3mdi49UMNECR+9SZzJq4tVukFvzXcE4W6q5Y/z/4=
+  file:
+    - book.epub
+    - book.mobi
+    - book.pdf
+  "on":
+    repo: GITenberg/Good-Stories-For-Great-Holidays--13-Arranged-for-Story-Telling-and-Reading-Aloud-and-for-the-Ch__359
+addons:
+  apt:
+    packages:
+    - xsltproc
+    - xvfb
+    - calibre
+    - python-pip
+    - git
+    - python-dev
+    - libjpeg-dev
+    - libpng-dev
+    - libfreetype6
+    - libfreetype6-dev
+    - zlib1g-dev
+    - python-lxml
+    - libxml2-dev
+    - libxslt1-dev
+    - tidy
